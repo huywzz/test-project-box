@@ -12,6 +12,9 @@ import { UsersController } from './users/users.controller';
 import helmet from 'helmet';
 import { APP_FILTER } from '@nestjs/core';
 import { HttpExceptionFilter } from './exceptions/http-exception.filter';
+import { AuthModule } from './auth/auth.module';
+import { JwtModule } from '@nestjs/jwt';
+import { jwtConstants } from './auth/constants';
 
 @Module({
   imports: [
@@ -26,17 +29,23 @@ import { HttpExceptionFilter } from './exceptions/http-exception.filter';
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_NAME'),
         entities: [join(process.cwd(), 'dist/**/*.entity.js')],
+        // entities: ['disk/users/user.entity.js'],
+        // migrations: ['disk/users/migrations/*.js'],
         synchronize: true,
       }),
     }),
+    JwtModule.register({
+      global: true,
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '120s' },
+    }),
+
     UsersModule,
     StorageModule,
+    AuthModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-  
-  ],
+  providers: [AppService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

@@ -1,10 +1,13 @@
+import { Expose } from "class-transformer";
 import { IsNotEmpty } from "class-validator";
 
 
-export class User {
+export class UserDTO {
+    @Expose()
     @IsNotEmpty()
-    name: string;
+    username: string;
 
+    @Expose()
     @IsNotEmpty()
-    age: number;
+    password: string;
 }

@@ -1,38 +1,29 @@
-import { Body, Controller, Get, Param, ParseBoolPipe, Post, Query, Req } from '@nestjs/common';
-import { User } from './dto/create-dto.user';
+import { Body, Controller, Get, HttpStatus, Param, ParseBoolPipe, ParseIntPipe, Post, Query, Req } from '@nestjs/common';
+import { UserDTO } from './dto/create-dto.user';
 import { UsersService } from './users.service';
 import { findOnePost } from './dto/param.dto.user';
 import { NotFound } from 'src/exceptions';
+import { plainToClass } from 'class-transformer';
+import { ApiResponse } from '@nestjs/swagger';
+import { CREATED, SuccessResponse } from 'src/shares';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
-  @Get('/allUser')
-  getAllUsers(@Query('isSort', ParseBoolPipe) isSort: boolean) {
-    console.log('sortBy:' + isSort);
+  @Post('')
+  @ApiResponse({
+    status: 201,
+    description: 'The record has been successfully created.',
+  })
+  async createUser(@Body() userDTO: UserDTO) {
+    const userObj = plainToClass(UserDTO, userDTO, {
+      excludeExtraneousValues: true,
+    });
     return {
-      name: 'Huy',
-      age: 19,
-    };
-  }
-  @Post('/create')
-  createUser(@Body() user: User) {
-    // console.log(user);
-    this.userService.createUser(user);
-    return {
-      user,
-    };
-  }
-  @Get(':id/:postId')
-  getUserbyId(@Param() param: findOnePost) {
-    // console.log(param.id); 
-    if (param.id!='1') {
-        throw new NotFound('userId')
+      message: 'created ss',
+      statusCode: HttpStatus.CREATED,
+      metadata: await this.userService.createUser(userObj)
     }
-    return {
-      id: param.id,
-      postId: param.postId,
-    };
   }
 }
