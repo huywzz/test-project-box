@@ -15,6 +15,7 @@ import { HttpExceptionFilter } from './exceptions/http-exception.filter';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './auth/constants';
+import { KeysModule } from './keys/keys.module';
 
 @Module({
   imports: [
@@ -36,13 +37,14 @@ import { jwtConstants } from './auth/constants';
     }),
     JwtModule.register({
       global: true,
-      secret: jwtConstants.secret,
-      signOptions: { expiresIn: '120s' },
+      // secret: jwtConstants.secret,
+      // signOptions: { expiresIn: '120s' },
     }),
 
     UsersModule,
     StorageModule,
     AuthModule,
+    KeysModule,
   ],
   controllers: [AppController],
   providers: [AppService],
