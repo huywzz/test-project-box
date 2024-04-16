@@ -26,4 +26,13 @@ export class UsersController {
       metadata: await this.userService.createUser(userObj)
     }
   }
+
+  @Get('/getall')
+  async getAllUser() {
+    return {
+      message: 'get all ss',
+      statusCode: HttpStatus.OK,
+      metadata:await this.userService.getAllUser()
+    }
+  }
 }
