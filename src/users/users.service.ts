@@ -6,6 +6,7 @@ import { User } from './entities/user.entity';
 import { FindOneOptions, Repository } from 'typeorm';
 import { IsExist } from 'src/exceptions';
 import * as bcrypt from 'bcrypt';
+import { UpdateUser } from './dto/update-dto.user';
 
 @Injectable()
 export class UsersService {
@@ -18,7 +19,7 @@ export class UsersService {
     async getOne(option: FindOneOptions<User>) {
         return await this.userRepository.findOne(option)
     }
-     async checkUsernameExist(username: string,userId?:number) {
+    async checkUsernameExist(username: string,userId?:number) {
         const user = !userId
             ? await this.getOne({
                 where: {
@@ -48,6 +49,11 @@ export class UsersService {
     async getAllUser() {
         return await this.userRepository.find({})
     }
-    
+    async updateProfileUser(dto: UpdateUser, user: User) {
+        await this.checkUsernameExist(dto.username)
+        Object.assign(user, dto)
+        const userUpdate = await this.userRepository.save(user)
+        return userUpdate
+    }
    
 }
