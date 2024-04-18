@@ -2,6 +2,8 @@ import { Body, Controller, Get, Post, Request, UseGuards } from '@nestjs/common'
 import { SignInDTo } from './dto/signin.dto';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './guard/auth,guard';
+import { LoginDTO } from './dto/login-dto';
+import { plainToClass } from 'class-transformer';
 
 @Controller('auth')
 export class AuthController {
@@ -20,5 +22,11 @@ export class AuthController {
   @Post('signup')
   async signup(@Body() siginDTO: SignInDTo) {
     return await this.authService.signUp(siginDTO);
+  }
+
+  @Post('login')
+  async login(@Body() login: LoginDTO) {
+    const loginDto = plainToClass(LoginDTO, login, { excludeExtraneousValues: true })
+    return await this.authService.login(loginDto)
   }
 }

@@ -33,6 +33,7 @@ import { KeysModule } from './keys/keys.module';
         // entities: ['disk/users/user.entity.js'],
         // migrations: ['disk/users/migrations/*.js'],
         synchronize: true,
+        logging: ['query', 'error'],
       }),
     }),
     JwtModule.register({
