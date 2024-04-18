@@ -21,6 +21,7 @@ import { SaveKey } from 'src/keys/dto/save-key.dto';
 import { KeysService } from 'src/keys/keys.service';
 import { LoginDTO } from './dto/login-dto';
 import * as bcrypt from 'bcrypt';
+import { payload } from './interface/payload.interface';
 
 @Injectable()
 export class AuthService {
@@ -42,8 +43,8 @@ export class AuthService {
       throw new UnauthorizedException();
     }
 
-    const payload = {
-      useId: user.id,
+    const payload: payload = {
+      userId: user.id,
       username: user.username,
     };
 
@@ -77,7 +78,7 @@ export class AuthService {
         const privateKey=crypto.randomBytes(64).toString('hex')
         
         const {id,username} = newUser
-        const payload={
+        const payload:payload={
           userId: id,
           username:username
         }
@@ -129,7 +130,7 @@ export class AuthService {
       const privateKey = crypto.randomBytes(64).toString('hex');
 
       const { id, username } = foundUser;
-      const payload = {
+      const payload:payload = {
          userId: id,
          username: username,
       };
