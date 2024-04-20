@@ -4,6 +4,9 @@ import { AuthService } from './auth.service';
 import { AuthGuard } from './guard/auth,guard';
 import { LoginDTO } from './dto/login-dto';
 import { plainToClass } from 'class-transformer';
+import { extractTokenFromHeader } from './utils';
+import { RefreshDTO } from './dto/refresh-dto';
+
 
 @Controller('auth')
 export class AuthController {
@@ -26,7 +29,16 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() login: LoginDTO) {
-    const loginDto = plainToClass(LoginDTO, login, { excludeExtraneousValues: true })
-    return await this.authService.login(loginDto)
+    const loginDto = plainToClass(LoginDTO, login, {
+      excludeExtraneousValues: true,
+    });
+    return await this.authService.login(loginDto);
+  }
+  @Post('refresh')
+  async refreshToken(@Request() req:Request) {
+    const { refreshToken, userIdFromHeader } = extractTokenFromHeader(req)
+    const userId = parseInt(userIdFromHeader)
+    const dto = new RefreshDTO(refreshToken, userId);
+    return await this.authService.getAccessToken(dto)
   }
 }

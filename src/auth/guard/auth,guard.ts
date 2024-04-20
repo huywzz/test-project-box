@@ -6,9 +6,6 @@ import { NotFound } from "src/exceptions";
 import { KeysService } from "src/keys/keys.service";
 import { payload } from "../interface/payload.interface";
 
-const HEADER = {
-  CLIENT_ID: 'x-client-id',
-};
 
 @Injectable()
 export class AuthGuard implements CanActivate{

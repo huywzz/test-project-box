@@ -35,4 +35,13 @@ export class UsersController {
       metadata:await this.userService.getAllUser()
     }
   }
+  @Get('/getkeybyuser/:id')
+  async getKeyByUser(@Param('id') id: string) {
+    const convert = parseInt(id)
+    return {
+      message: 'get all ss',
+      statusCode: HttpStatus.OK,
+      metadata: await this.userService.getKeyByUser(convert),
+    };
+  }
 }

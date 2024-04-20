@@ -23,4 +23,7 @@ export class User {
 
         @OneToMany(() => Keys, (key) => key.user)
         keys: Keys[]
+
+        // @Column()
+        // address:string
 }

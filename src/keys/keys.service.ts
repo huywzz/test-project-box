@@ -33,4 +33,14 @@ export class KeysService {
         obj.isOldRF = true
         await this.keyRepository.save(obj) 
     }
+    async updateIsOld(userId:number) {
+        const foundKey = await this.getOneKey({
+            where: {
+                isOldRF: false,
+                userId:userId
+            }
+        })
+        foundKey.isOldRF = true
+        await this.keyRepository.save(foundKey)
+    }
 }

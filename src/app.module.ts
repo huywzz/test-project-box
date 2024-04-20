@@ -31,7 +31,7 @@ import { KeysModule } from './keys/keys.module';
         database: configService.get('DB_NAME'),
         entities: [join(process.cwd(), 'dist/**/*.entity.js')],
         // entities: ['disk/users/user.entity.js'],
-        // migrations: ['disk/users/migrations/*.js'],
+        migrations: ['disk/db/migrations/*.js'],
         synchronize: true,
         logging: ['query', 'error'],
       }),
@@ -55,7 +55,7 @@ export class AppModule implements NestModule {
     consumer
       .apply(helmet(), new LoggerMiddleware().use)
       .exclude(
-        // { path: '/users/create', method: RequestMethod.POST },
+        // { path: '/users/create', methodnpm: RequestMethod.POST },
         { path: '/users/:id/:postId', method: RequestMethod.GET },
       )
       .forRoutes(UsersController);

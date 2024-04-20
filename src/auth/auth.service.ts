@@ -22,6 +22,8 @@ import { KeysService } from 'src/keys/keys.service';
 import { LoginDTO } from './dto/login-dto';
 import * as bcrypt from 'bcrypt';
 import { payload } from './interface/payload.interface';
+import { RefreshDTO } from './dto/refresh-dto';
+
 
 @Injectable()
 export class AuthService {
@@ -56,18 +58,26 @@ export class AuthService {
   }
 
    async generateToken(payload: any, publicKey: string, privateKey: string){
-      const refreshToken = await this.jwtService.signAsync(payload, {
-        privateKey: privateKey,
-        expiresIn: '7d',
-      });
-      const accessToken = await this.jwtService.signAsync(payload, {
-        privateKey: publicKey,
-        expiresIn: '1d',
-      });
-      return {
-        refreshToken: refreshToken,
-        accessToken: accessToken,
-      };
+      try {
+        const refreshToken = await this.jwtService.signAsync(payload, {
+          privateKey: privateKey,
+          expiresIn: '7d',
+        });
+
+        const accessToken = await this.jwtService.signAsync(payload, {
+          privateKey: publicKey,
+          expiresIn: '1d',
+        });
+        console.log(accessToken);
+        
+        return {
+          refreshToken: refreshToken,
+          accessToken: accessToken,
+        };
+      } catch (error) {
+          console.log('::loi o genarate',error);
+          
+      }
   }
   async signUp(dto: SignInDTo) {
      const objUser=new UserDTO()
@@ -152,6 +162,57 @@ export class AuthService {
       error: new Error('not found key of user')
     }
 
+  }
+  async getAccessToken(refreshDTO: RefreshDTO) {
+    const resultQuery = await this.usersService.getKeyByUser(refreshDTO.userId);
+    const { user_id, user_username, key_publicKey, key_refreshToken,key_privateKey } = resultQuery;
+    
+    if (refreshDTO.refreshToken !== key_refreshToken) {
+      throw new BadRequestException('Wrong');
+    }
+    if (refreshDTO.userId !== user_id) {
+      throw new BadRequestException('Register ');
+    }
+    try {
+      const userDecode: payload = await this.jwtService.verifyAsync(refreshDTO.refreshToken, {
+        secret:key_privateKey
+      })
+      console.log('decode::', userDecode);
+      
+      if (userDecode.userId !== refreshDTO.userId) {
+        throw new BadRequestException('Wrong');
+      }
+
+      const payload: payload = {
+        userId: user_id,
+        username: user_username,
+      };
+      const publicKey = crypto.randomBytes(64).toString('hex');
+      const privateKey = crypto.randomBytes(64).toString('hex');
+      const { refreshToken, accessToken } = await this.generateToken(
+        payload,
+        publicKey,
+        privateKey,
+      );
+      await this.keyService.updateIsOld(payload.userId)
+
+       const saveKey = new SaveKey(
+         publicKey,
+         privateKey,
+         refreshToken,
+         payload.userId,
+       );
+      const newKey = await this.keyService.saveKey(saveKey);
+      return {
+        userId: payload.userId,
+        username: payload.username,
+        accessToken: accessToken,
+        refreshToken: newKey.refreshToken,
+      };
+
+    } catch (error) {
+       throw new UnauthorizedException();
+    }
   }
   
 }

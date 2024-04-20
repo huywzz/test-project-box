@@ -10,51 +10,69 @@ import { UpdateUser } from './dto/update-dto.user';
 
 @Injectable()
 export class UsersService {
-   
-    constructor(@InjectRepository(User) private userRepository:Repository<User>){}
+  constructor(
+    @InjectRepository(User) private userRepository: Repository<User>,
+  ) {}
 
-    async findOneByUserName(username: string){
-        return await this.userRepository.findOneBy({username})
+  async findOneByUserName(username: string) {
+    return await this.userRepository.findOneBy({ username });
+  }
+  async getOne(option: FindOneOptions<User>) {
+    return await this.userRepository.findOne(option);
+  }
+  async checkUsernameExist(username: string, userId?: number) {
+    const user = !userId
+      ? await this.getOne({
+          where: {
+            username: username,
+          },
+        })
+      : await this.getOne({
+          where: {
+            username: username,
+            id: userId,
+          },
+        });
+    if (user) {
+      throw new BadRequestException('user exist');
     }
-    async getOne(option: FindOneOptions<User>) {
-        return await this.userRepository.findOne(option)
-    }
-    async checkUsernameExist(username: string,userId?:number) {
-        const user = !userId
-            ? await this.getOne({
-                where: {
-                        username:username,
-                    }
-            })
-            : await this.getOne({
-                where: {
-                    username: username,
-                    id:userId
-                }
-            })
-        if (user) {
-            throw new BadRequestException('user exist')
-        }
-    }
-    async createUser(user:UserDTO){
-        await this.checkUsernameExist(user.username)
-        const saltOrRounds = 10;
-        const password = user.password 
-        user.password = await bcrypt.hash(password, saltOrRounds);
-        const userSave = new User();
-        Object.assign(userSave, user)
-        const newUser = await this.userRepository.save(userSave);
-        return newUser;
-    }
-    async getAllUser() {
-        return await this.userRepository.find({})
-    }
-    async updateProfileUser(dto: UpdateUser, user: User) {
-        await this.checkUsernameExist(dto.username)
-        Object.assign(user, dto)
-        const userUpdate = await this.userRepository.save(user)
-        return userUpdate
-    }
-   
-    
+  }
+  async createUser(user: UserDTO) {
+    await this.checkUsernameExist(user.username);
+    const saltOrRounds = 10;
+    const password = user.password;
+    user.password = await bcrypt.hash(password, saltOrRounds);
+    const userSave = new User();
+    Object.assign(userSave, user);
+    const newUser = await this.userRepository.save(userSave);
+    return newUser;
+  }
+  async getAllUser() {
+    return await this.userRepository.find({});
+  }
+  async updateProfileUser(dto: UpdateUser, user: User) {
+    await this.checkUsernameExist(dto.username);
+    Object.assign(user, dto);
+    const userUpdate = await this.userRepository.save(user);
+    return userUpdate;
+  }
+
+  async getKeyByUser(userId:number) {
+      const result = await this.userRepository
+        .createQueryBuilder('user')
+        .innerJoin('user.keys', 'key')
+        .select([
+          'user.id',
+          'user.username',
+          'key.publicKey',
+          'key.privateKey',
+          'key.refreshToken',
+        ])
+        .where('user.id=:userId', { userId: userId })
+        .andWhere('key.isOldRF=false')
+        .getRawOne();
+      console.log('::result query::', result);
+        
+      return result
+  }
 }
