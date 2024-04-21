@@ -22,10 +22,15 @@ import { ApiResponse } from '@nestjs/swagger';
 import { CREATED, SuccessResponse } from 'src/shares';
 import { AuthGuard } from 'src/auth/guard/auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { configStorage } from 'helper/config.upload';
+import { StorageFileDTO } from 'src/storage/dto/storage-file.dto';
+import { FileService } from 'src/file/file.service';
+import { StorageService } from 'src/storage/storage.service';
+
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly userService: UsersService) {}
+  constructor(private readonly userService: UsersService, private readonly storageService:StorageService) {}
 
   @Post('')
   @ApiResponse({
@@ -63,8 +68,19 @@ export class UsersController {
   @Post('upload-avt')
   
   @UseGuards(AuthGuard)
-  @UseInterceptors(FileInterceptor('avt'))
+  @UseInterceptors(FileInterceptor('avt',
+    {
+      storage:configStorage('user')
+    }
+  ))
   async uploadAvt(@Req() req: any, @UploadedFile() file: Express.Multer.File) {
     console.log('upload avatar::', file);
+    console.log('userId::', req.user);
+    const dto= new StorageFileDTO(req.user.userId,file.path)
+    return {
+      message: 'upload ss',
+      statusCode: 200,
+      metadata:await this.storageService.storageFile(dto)
+    };
   }
 }

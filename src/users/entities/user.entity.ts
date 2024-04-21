@@ -1,4 +1,5 @@
 import { Keys } from 'src/keys/key.entity';
+import { File } from 'src/storage/entities/file.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'users' })
@@ -24,6 +25,6 @@ export class User {
         @OneToMany(() => Keys, (key) => key.user)
         keys: Keys[]
 
-        // @Column()
-        // address:string
+        @OneToMany(() => File, (file) => file.user)
+        files: File[]
 }
