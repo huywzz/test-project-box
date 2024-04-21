@@ -16,6 +16,7 @@ import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './auth/constants';
 import { KeysModule } from './keys/keys.module';
+import { FileModule } from './file/file.module';
 
 @Module({
   imports: [
@@ -38,13 +39,10 @@ import { KeysModule } from './keys/keys.module';
     }),
     JwtModule.register({
       global: true,
-      // secret: jwtConstants.secret,
-      // signOptions: { expiresIn: '120s' },
     }),
-
+    AuthModule,
     UsersModule,
     StorageModule,
-    AuthModule,
     KeysModule,
   ],
   controllers: [AppController],
