@@ -1,0 +1,1 @@
+export const allowType:string[]=['jpg','png','jpeg']

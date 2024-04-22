@@ -17,6 +17,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './auth/constants';
 import { KeysModule } from './keys/keys.module';
 import { FileModule } from './file/file.module';
+import { CheckFileMiddleware } from './users/Middleware/check-file.middleware';
 
 @Module({
   imports: [
@@ -52,10 +53,10 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(helmet(), new LoggerMiddleware().use)
-      .exclude(
-        // { path: '/users/create', methodnpm: RequestMethod.POST },
-        { path: '/users/:id/:postId', method: RequestMethod.GET },
-      )
+      // .exclude(
+      //   // { path: '/users/create', methodnpm: RequestMethod.POST },
+      //   { path: '/users/:id/:postId', method: RequestMethod.GET },
+      // )
       .forRoutes(UsersController);
   }
 }

@@ -1,0 +1,1 @@
+export const fileSize: number = 1024 * 1024 * 10

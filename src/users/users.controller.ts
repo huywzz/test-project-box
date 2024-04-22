@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -26,6 +27,9 @@ import { configStorage } from 'helper/config.upload';
 import { StorageFileDTO } from 'src/storage/dto/storage-file.dto';
 import { FileService } from 'src/file/file.service';
 import { StorageService } from 'src/storage/storage.service';
+import { error } from 'console';
+import { extname } from 'path';
+import { allowType, fileSize } from './constants';
 
 
 @Controller('users')
@@ -66,16 +70,30 @@ export class UsersController {
     };
   }
   @Post('upload-avt')
-  
   @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('avt',
     {
-      storage:configStorage('user')
+      storage: configStorage('user'),
+      fileFilter(req, file, callback) {
+        const ext = extname(file.originalname)
+        if (!allowType.includes(ext)) {
+          req.fileValidationError = 'Wrong extension type';
+          callback(null, false);
+        } else if (file.size > fileSize) {
+          req.fileValidationError = 'File is too large';
+          callback(null, false);
+        } else {
+          callback(null, true)
+        }
+      },
     }
   ))
   async uploadAvt(@Req() req: any, @UploadedFile() file: Express.Multer.File) {
     console.log('upload avatar::', file);
     console.log('userId::', req.user);
+    if (req.fileValidationError) {
+      throw new BadRequestException(req.fileValidationError);
+    }
     const dto= new StorageFileDTO(req.user.userId,file.path)
     return {
       message: 'upload ss',
