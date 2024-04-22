@@ -17,7 +17,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './auth/constants';
 import { KeysModule } from './keys/keys.module';
 import { FileModule } from './file/file.module';
-import { CheckFileMiddleware } from './users/Middleware/check-file.middleware';
+
 
 @Module({
   imports: [
