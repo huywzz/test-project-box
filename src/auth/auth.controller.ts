@@ -22,6 +22,7 @@ export class AuthController {
   async signIn(@Body() siginDTO: SignInDTo) {
     return this.authService.signIn(siginDTO.username, siginDTO.password);
   }
+
   @UseGuards(AuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
@@ -29,7 +30,7 @@ export class AuthController {
   }
 
   @Post('signup')
-  async signup(@Body() siginDTO: SignInDTo) {
+  async signup(@Body() siginDTO: SignInDTo) { 
     return await this.authService.signUp(siginDTO);
   }
 
@@ -40,6 +41,7 @@ export class AuthController {
     });
     return await this.authService.login(loginDto);
   }
+   
   @Post('refresh')
   async refreshToken(@Request() req: Request) {
     const { refreshToken, userIdFromHeader } = extractTokenFromHeader(req);
